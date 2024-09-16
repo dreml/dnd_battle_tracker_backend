@@ -14,6 +14,6 @@ func init() {
 }
 
 func main() {
-	server := api.NewServer(":3000")
-	log.Fatal(server.Start())
+	server := api.NewServer("127.0.0.1:3000")
+	log.Fatal(server.ListenAndServe())
 }

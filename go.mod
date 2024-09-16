@@ -5,6 +5,7 @@ go 1.22.5
 require (
 	github.com/TrustRevoked/iferr v0.0.0-20170823114626-fc3ca67fe827 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
