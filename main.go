@@ -3,6 +3,7 @@ package main
 import (
 	"battle_tracker/api"
 	"log"
+	"net/http"
 
 	"github.com/joho/godotenv"
 )
@@ -14,6 +15,9 @@ func init() {
 }
 
 func main() {
-	server := api.NewServer("127.0.0.1:3000")
-	log.Fatal(server.ListenAndServe())
+	apiRouter := api.NewApiRouter()
+	// socketServer := socketio.NewServer(nil)
+
+	http.Handle("/api/", apiRouter)
+	log.Fatal(http.ListenAndServe("127.0.0.1:3000", nil))
 }
