@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -51,6 +52,29 @@ func NewApiRouter() *mux.Router {
 	s.HandleFunc("/monster/{monster}", as.handleGetMonster).Methods("GET")
 
 	return r
+}
+
+func NewEchoRouter(e *echo.Group) {
+	client, _ := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	monstersCollection := client.Database("battle_tracker").Collection("monsters")
+	as := &ApiServer{
+		monstersCollection: monstersCollection,
+	}
+	e.GET("/monsters", as.handleGetMonstersEcho)
+}
+
+func (as *ApiServer) handleGetMonstersEcho(c echo.Context) error {
+	cursor, err := as.monstersCollection.Find(context.TODO(), bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var monsters []common.MonsterInfo
+	if err = cursor.All(context.TODO(), &monsters); err != nil {
+		log.Fatal(err)
+	}
+
+	return c.JSON(http.StatusOK, monsters)
 }
 
 func (as *ApiServer) handleGetMonsters(w http.ResponseWriter, r *http.Request) {
