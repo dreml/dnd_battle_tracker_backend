@@ -1,6 +1,7 @@
 package api
 
 import (
+	"battle_tracker/internal/campaigns"
 	"battle_tracker/pkg/common"
 	"context"
 	"errors"
@@ -23,12 +24,26 @@ func NewEchoRouter(e *echo.Group) {
 		log.Fatal(err)
 	}
 
-	monstersCollection := client.Database("battle_tracker").Collection("monsters")
+	db := client.Database("battle_tracker")
+
+	// monsters router
+	monstersCollection := db.Collection("monsters")
 	as := &ApiServer{
 		monstersCollection: monstersCollection,
 	}
 	e.GET("/monsters", as.handleGetMonsters)
 	e.GET("/monsters/:monster_index", as.handleGetMonster)
+
+	// campaigns router
+	cs := campaigns.NewCampaignService(db)
+	cr := e.Group("/campaigns")
+	cr.GET("/", cs.HandleGetCampaigns)
+	cr.GET("/:campaignId", cs.HandleGetCampaign)
+	cr.POST("/:campaignId", cs.HandleCreateCampaign)
+	cr.PATCH("/:campaignId", cs.HandleUpdateCampaign)
+	cr.DELETE("/:campaignId", cs.HandleDeleteCampaign)
+
+	// characters router
 }
 
 func (as *ApiServer) handleGetMonsters(c echo.Context) error {

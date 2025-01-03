@@ -16,3 +16,7 @@ type Monster struct {
 	HitPoints int    `json:"hit_points"`
 	Image     string `json:"image"`
 }
+
+type ErrorResponse struct {
+	Message string `json:"message"`
+}

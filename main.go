@@ -17,11 +17,11 @@ func init() {
 }
 
 func main() {
-	// apiRouter := api.NewApiRouter()
-	// // socketServer := socketio.NewServer(nil)
-	//
-	// http.Handle("/api/", apiRouter)
-	// log.Fatal(http.ListenAndServe("127.0.0.1:3000", nil))
+	// client, _ := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	// d := client.Database("battle_tracker")
+	// cs := campaigns.NewCampaignService(d)
+	// c, _ := cs.HandleGetCampaigns()
+	// fmt.Println(c)
 
 	e := echo.New()
 
