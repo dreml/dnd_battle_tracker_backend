@@ -35,13 +35,13 @@ func NewEchoRouter(e *echo.Group) {
 	e.GET("/monsters/:monster_index", as.handleGetMonster)
 
 	// campaigns router
-	cs := campaigns.NewCampaignService(db)
+	campaignsHandler := campaigns.NewHandler(db)
 	cr := e.Group("/campaigns")
-	cr.GET("/", cs.HandleGetCampaigns)
-	cr.GET("/:campaignId", cs.HandleGetCampaign)
-	cr.POST("/:campaignId", cs.HandleCreateCampaign)
-	cr.PATCH("/:campaignId", cs.HandleUpdateCampaign)
-	cr.DELETE("/:campaignId", cs.HandleDeleteCampaign)
+	cr.GET("", campaignsHandler.GetCampaigns)
+	cr.POST("", campaignsHandler.CreateCampaign)
+	cr.GET("/:campaignId", campaignsHandler.GetCampaign)
+	cr.PATCH("/:campaignId", campaignsHandler.UpdateCampaign)
+	cr.DELETE("/:campaignId", campaignsHandler.DeleteCampaign)
 
 	// characters router
 }
