@@ -1,4 +1,4 @@
-package campaigns
+package characters
 
 import (
 	"battle_tracker/pkg/common"
@@ -12,35 +12,35 @@ import (
 )
 
 type Handler struct {
-	service *CampaignService
+	service *CharacterService
 }
 
 func NewHandler(db *mongo.Database) *Handler {
 	return &Handler{
-		service: NewCampaignService(db),
+		service: NewCharacterService(db),
 	}
 }
 
-func (h *Handler) GetCampaigns(c echo.Context) error {
-	campaigns, err := h.service.getAllCampaigns()
+func (h *Handler) GetCharacters(c echo.Context) error {
+	characters, err := h.service.getAllCharacters()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	var response GetCampaignsResponse
-	for _, campaign := range campaigns {
-		response = append(response, createCampaignResponseFromCampaign(campaign))
+	var response GetCharactersResponse
+	for _, character := range characters {
+		response = append(response, createCharacterResponseFromCharacter(character))
 	}
 
 	return c.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) GetCampaign(c echo.Context) error {
-	campaignId := c.Param("campaignId")
+func (h *Handler) GetCharacter(c echo.Context) error {
+	characterId := c.Param("characterId")
 
-	campaign, err := h.service.getCampaign(campaignId)
+	character, err := h.service.getCharacter(characterId)
 
-	fmt.Printf("%+v\n", campaign)
+	fmt.Printf("%+v\n", character)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return c.JSON(http.StatusNotFound, nil)
 	} else if err != nil {
@@ -48,36 +48,32 @@ func (h *Handler) GetCampaign(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, common.ErrorResponse{Message: "Error"})
 	}
 
-	return c.JSON(http.StatusOK, createCampaignResponseFromCampaign(campaign))
+	return c.JSON(http.StatusOK, createCharacterResponseFromCharacter(character))
 }
 
-func (h *Handler) CreateCampaign(c echo.Context) error {
-	var request CreateCampaignRequest
+func (h *Handler) CreateCharacter(c echo.Context) error {
+	var request CreateCharacterRequest
 	if err := c.Bind(&request); err != nil {
 		c.JSON(http.StatusBadRequest, nil)
 	}
 
-	campaign, err := h.service.createCampaign(request)
+	character, err := h.service.createCharacter(request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	return c.JSON(http.StatusOK, createCampaignResponseFromCampaign(campaign))
+	return c.JSON(http.StatusOK, createCharacterResponseFromCharacter(character))
 }
 
-func (h *Handler) UpdateCampaign(c echo.Context) error {
-	campaignId := c.Param("campaignId")
+func (h *Handler) UpdateCharacter(c echo.Context) error {
+	characterId := c.Param("characterId")
 
-	var request UpdateCampaignRequest
+	var request UpdateCharacterRequest
 	if err := c.Bind(&request); err != nil {
 		c.JSON(http.StatusBadRequest, nil)
 	}
 
-	if request.Name == "" {
-		return c.JSON(http.StatusBadRequest, nil)
-	}
-
-	campaign, err := h.service.updateCampaign(campaignId, request)
+	character, err := h.service.updateCharacter(characterId, request)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return c.JSON(http.StatusNotFound, nil)
@@ -86,13 +82,13 @@ func (h *Handler) UpdateCampaign(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, common.ErrorResponse{Message: "Error"})
 	}
 
-	return c.JSON(http.StatusOK, createCampaignResponseFromCampaign(campaign))
+	return c.JSON(http.StatusOK, createCharacterResponseFromCharacter(character))
 }
 
-func (h *Handler) DeleteCampaign(c echo.Context) error {
-	campaignId := c.Param("campaignId")
+func (h *Handler) DeleteCharacter(c echo.Context) error {
+	characterId := c.Param("characterId")
 
-	err := h.service.deleteCampaign(campaignId)
+	err := h.service.deleteCharacter(characterId)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return c.JSON(http.StatusNotFound, nil)

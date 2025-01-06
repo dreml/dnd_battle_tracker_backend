@@ -2,6 +2,7 @@ package api
 
 import (
 	"battle_tracker/internal/campaigns"
+	"battle_tracker/internal/characters"
 	"battle_tracker/pkg/common"
 	"context"
 	"errors"
@@ -44,6 +45,13 @@ func NewEchoRouter(e *echo.Group) {
 	cr.DELETE("/:campaignId", campaignsHandler.DeleteCampaign)
 
 	// characters router
+	charactersHandler := characters.NewHandler(db)
+	chr := e.Group("/characters")
+	chr.GET("", charactersHandler.GetCharacters)
+	chr.POST("", charactersHandler.CreateCharacter)
+	chr.GET("/:characterId", charactersHandler.GetCharacter)
+	chr.PATCH("/:characterId", charactersHandler.UpdateCharacter)
+	chr.DELETE("/:characterId", charactersHandler.DeleteCharacter)
 }
 
 func (as *ApiServer) handleGetMonsters(c echo.Context) error {

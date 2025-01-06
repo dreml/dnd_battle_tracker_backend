@@ -20,7 +20,7 @@ func (cs *CampaignService) getAllCampaigns() ([]Campaign, error) {
 }
 
 func (cs *CampaignService) getCampaign(campaignId string) (Campaign, error) {
-	return cs.repository.getCampaignByID(campaignId)
+	return cs.repository.findCampaignByID(campaignId)
 }
 
 func (cs *CampaignService) deleteCampaign(campaignId string) error {

@@ -33,7 +33,7 @@ func (cr *CampaignsRepository) findCampaigns() ([]Campaign, error) {
 	return campaigns, nil
 }
 
-func (cr *CampaignsRepository) getCampaignByID(campaignId string) (Campaign, error) {
+func (cr *CampaignsRepository) findCampaignByID(campaignId string) (Campaign, error) {
 	id, _ := primitive.ObjectIDFromHex(campaignId)
 	filter := bson.M{"_id": id}
 
