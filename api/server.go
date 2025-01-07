@@ -3,14 +3,11 @@ package api
 import (
 	"battle_tracker/internal/campaigns"
 	"battle_tracker/internal/characters"
-	"battle_tracker/pkg/common"
+	"battle_tracker/internal/monsters"
 	"context"
-	"errors"
 	"log"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -28,12 +25,14 @@ func NewEchoRouter(e *echo.Group) {
 	db := client.Database("battle_tracker")
 
 	// monsters router
-	monstersCollection := db.Collection("monsters")
-	as := &ApiServer{
-		monstersCollection: monstersCollection,
-	}
-	e.GET("/monsters", as.handleGetMonsters)
-	e.GET("/monsters/:monster_index", as.handleGetMonster)
+	monstersHandler := monsters.NewHandler(db)
+	mr := e.Group("/monsters")
+	mr.GET("", monstersHandler.GetMonsters)
+	mr.POST("", monstersHandler.CreateMonster)
+	// mr.GET("/:monsterSlug", monstersHandler.GetMonsterBySlug)
+	mr.GET("/:monsterId", monstersHandler.GetMonster)
+	mr.PATCH("/:monsterId", monstersHandler.UpdateMonster)
+	mr.DELETE("/:monsterId", monstersHandler.DeleteMonster)
 
 	// campaigns router
 	campaignsHandler := campaigns.NewHandler(db)
@@ -52,35 +51,4 @@ func NewEchoRouter(e *echo.Group) {
 	chr.GET("/:characterId", charactersHandler.GetCharacter)
 	chr.PATCH("/:characterId", charactersHandler.UpdateCharacter)
 	chr.DELETE("/:characterId", charactersHandler.DeleteCharacter)
-}
-
-func (as *ApiServer) handleGetMonsters(c echo.Context) error {
-	cursor, err := as.monstersCollection.Find(context.TODO(), bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var monsters []common.MonsterInfo
-	if err = cursor.All(context.TODO(), &monsters); err != nil {
-		log.Fatal(err)
-	}
-
-	return c.JSON(http.StatusOK, monsters)
-}
-
-func (as *ApiServer) handleGetMonster(c echo.Context) error {
-	monster_index := c.Param("monster_index")
-	filter := bson.M{"index": monster_index}
-
-	var monster common.Monster
-	err := as.monstersCollection.FindOne(context.Background(), filter).Decode(&monster)
-
-	if errors.Is(err, mongo.ErrNoDocuments) {
-		return c.JSON(http.StatusNotFound, nil)
-	} else if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, nil)
-	} else {
-		return c.JSON(http.StatusOK, monster)
-	}
 }

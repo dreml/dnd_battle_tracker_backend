@@ -3,7 +3,6 @@ package characters
 import (
 	"battle_tracker/pkg/common"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -40,7 +39,6 @@ func (h *Handler) GetCharacter(c echo.Context) error {
 
 	character, err := h.service.getCharacter(characterId)
 
-	fmt.Printf("%+v\n", character)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return c.JSON(http.StatusNotFound, nil)
 	} else if err != nil {
